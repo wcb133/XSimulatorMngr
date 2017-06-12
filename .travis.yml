@@ -1,3 +1,4 @@
 language: objective-c
 xcode_project: XSimulatorMngr.xcodeproj
 xcode_scheme: XSimulatorMngr
+osx_image: xcode8.3

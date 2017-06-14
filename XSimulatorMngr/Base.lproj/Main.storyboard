@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -63,6 +63,10 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
                     <connections>
+                        <outlet property="hideIPadMenuItem" destination="9wP-Tz-Cvj" id="g43-fm-fel"/>
+                        <outlet property="hideIPhoneMenuItem" destination="cqm-s4-aAw" id="919-Q1-DiL"/>
+                        <outlet property="hideTVMenuItem" destination="ahK-2P-ZQ2" id="BtV-ZZ-j20"/>
+                        <outlet property="hideWatchMenuItem" destination="67S-q7-1uy" id="11r-oo-32P"/>
                         <outlet property="recentAppsMenuItem" destination="A4P-RB-8z0" id="wx9-te-Auw"/>
                         <outlet property="recentSimulatorMenuItem" destination="T4O-nc-WO7" id="Gcw-1y-hea"/>
                         <outlet property="refreshSimulatorsMenuItem" destination="7Cm-pz-PvR" id="eEq-Mn-Qem"/>
@@ -72,23 +76,48 @@
                 <menu id="F2o-9k-TAT">
                     <items>
                         <menuItem isSeparatorItem="YES" id="ics-6x-VKB"/>
+                        <menuItem title="Hide iPhone Simulators" id="cqm-s4-aAw">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableIPhoneSimulators:" target="Voe-Tx-rLC" id="wYJ-Oh-1D4"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Hide iPad Simulators" id="9wP-Tz-Cvj">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableIPadSimulators:" target="Voe-Tx-rLC" id="vuF-dR-VTk"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Hide TV Simulators" id="ahK-2P-ZQ2">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableTVSimulators:" target="Voe-Tx-rLC" id="YpI-J2-fyc"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Hide Watch Simulators" id="67S-q7-1uy">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableWatchSimulators:" target="Voe-Tx-rLC" id="GDg-mH-ZuV"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem isSeparatorItem="YES" id="Jgd-JL-R5Q"/>
+                        <menuItem title="Hide Recent App" id="A4P-RB-8z0">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableRecentApps:" target="Voe-Tx-rLC" id="qcG-nd-Uvw"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Hide Recent Simulator" id="T4O-nc-WO7">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="actionEnableRecentSimulators:" target="Voe-Tx-rLC" id="tvy-DD-Adj"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem isSeparatorItem="YES" id="vzM-y2-lJo"/>
                         <menuItem title="Refresh Simulators" id="7Cm-pz-PvR">
                             <modifierMask key="keyEquivalentModifierMask"/>
                             <connections>
                                 <action selector="actionRefreshSimulators:" target="Voe-Tx-rLC" id="y6Q-cU-ytA"/>
-                            </connections>
-                        </menuItem>
-                        <menuItem isSeparatorItem="YES" id="vzM-y2-lJo"/>
-                        <menuItem title="Disable Recent App" id="A4P-RB-8z0">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                            <connections>
-                                <action selector="actionRecentApps:" target="Voe-Tx-rLC" id="kZD-o2-GLL"/>
-                            </connections>
-                        </menuItem>
-                        <menuItem title="Disable Recent Simulator" id="T4O-nc-WO7">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                            <connections>
-                                <action selector="actionRecentSimulator:" target="Voe-Tx-rLC" id="xgz-MY-8bz"/>
                             </connections>
                         </menuItem>
                         <menuItem title="Reset All Simulators" id="56J-eh-wcy">

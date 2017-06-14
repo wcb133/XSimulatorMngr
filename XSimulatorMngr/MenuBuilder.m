@@ -14,7 +14,7 @@
 
 - (void)update {
     NSUInteger count = [[self.menu itemArray] count];
-    for (NSInteger index = 0; index < count - 7; index++) {
+    for (NSInteger index = 0; index < count - 12; index++) {
         [self.menu removeItemAtIndex:0];
     }
     
@@ -48,9 +48,22 @@
 - (void)buildMenuForSimulators {
     NSInteger index = 0;
     for (SimulatorDevice *simulator in self.recent.simulators) {
+        if (self.recent.iphoneDisabled && simulator.type == DeviceTypeIPhone) {
+            continue;
+        }
+        if (self.recent.ipadDisabled && simulator.type == DeviceTypeIPad) {
+            continue;
+        }
+        if (self.recent.tvDisabled && simulator.type == DeviceTypeTV) {
+            continue;
+        }
+        if (self.recent.watchDisabled && simulator.type == DeviceTypeWatch) {
+            continue;
+        }
+
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
         menuItem.representedObject = simulator;
-        menuItem.title = [simulator.name stringByAppendingFormat: @" (%@)", simulator.runtimeVersion];
+        menuItem.title = simulator.title;
         menuItem.target = self;
         menuItem.action = @selector(noAction:);
         
@@ -144,7 +157,7 @@
     if (self.recent.simulator) {
         NSMenuItem* menuItem = [[NSMenuItem alloc] init];
         menuItem.representedObject = self.recent.simulator;
-        menuItem.title = [self.recent.simulator.name stringByAppendingFormat:@" (%@)", self.recent.simulator.runtimeVersion];
+        menuItem.title = self.recent.simulator.title;
         menuItem.target = self;
         menuItem.action = @selector(noAction:);
         

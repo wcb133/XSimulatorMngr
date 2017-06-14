@@ -7,16 +7,23 @@
 
 #import <Foundation/Foundation.h>
 
+
+typedef enum : NSUInteger {
+    DeviceTypeNone,
+    DeviceTypeIPhone,
+    DeviceTypeIPad,
+    DeviceTypeTV,
+    DeviceTypeWatch
+} DeviceType;
+
+
 @interface SimulatorDevice : NSObject
 @property (nonatomic, strong) NSString *udid;
-@property (nonatomic, strong) NSString *deviceType;
-@property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) NSString *runtime;
-@property (nonatomic, strong) NSNumber *state;
+@property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *path;
+@property (nonatomic, assign) DeviceType type;
 
 - (instancetype)initWithPath:(NSString *)path;
 - (NSArray *)applications;
 - (NSString *)appDataPath;
-- (NSString *)runtimeVersion;
 @end

@@ -21,7 +21,12 @@
 
 
 @interface SimulatorDevice()
-@property (strong, nonatomic) NSMutableArray *appList;
+@property (nonatomic, strong) NSMutableArray *appList;
+@property (nonatomic, strong) NSString *deviceType;
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *runtime;
+@property (nonatomic, strong) NSString *runtimeVersion;
+@property (nonatomic, strong) NSNumber *state;
 @end
 
 
@@ -48,9 +53,13 @@
     NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:infoPlist];
     if (infoDict) {
         self.name = infoDict[@"name"];
+        self.runtime = infoDict[@"runtime"];
+        self.title = [self.name stringByAppendingFormat:@" (%@)", self.runtimeVersion];
+        
         self.udid = infoDict[@"UDID"];
         self.deviceType = infoDict[@"deviceType"];
-        self.runtime = infoDict[@"runtime"];
+        [self updateType];
+
         self.state = infoDict[@"state"];
         self.path = path;
         return YES;
@@ -68,6 +77,26 @@
     version = [version stringByReplacingOccurrencesOfString:@"iOS-" withString:@"iOS "];
     version = [version stringByReplacingOccurrencesOfString:@"-" withString:@"."];
     return version;
+}
+
+- (void)updateType {
+    NSArray *components = [self.deviceType componentsSeparatedByString: @"."];
+    self.type = DeviceTypeNone;
+    if (components.count > 0) {
+        NSString *lastComponent = [components[components.count - 1] lowercaseString];
+        if ([lastComponent rangeOfString: @"iphone"].location != NSNotFound) {
+            self.type = DeviceTypeIPhone;
+        }
+        else if ([lastComponent rangeOfString: @"ipad"].location != NSNotFound) {
+            self.type = DeviceTypeIPad;
+        }
+        else if ([lastComponent rangeOfString: @"tv"].location != NSNotFound) {
+            self.type = DeviceTypeTV;
+        }
+        else if ([lastComponent rangeOfString: @"watch"].location != NSNotFound) {
+            self.type = DeviceTypeWatch;
+        }
+    }
 }
 
 - (NSArray *)applications {

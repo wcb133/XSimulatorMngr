@@ -17,6 +17,10 @@
 @property (weak) IBOutlet NSMenuItem *recentAppsMenuItem;
 @property (weak) IBOutlet NSMenuItem *recentSimulatorMenuItem;
 @property (weak) IBOutlet NSMenuItem *refreshSimulatorsMenuItem;
+@property (weak) IBOutlet NSMenuItem *hideIPhoneMenuItem;
+@property (weak) IBOutlet NSMenuItem *hideIPadMenuItem;
+@property (weak) IBOutlet NSMenuItem *hideTVMenuItem;
+@property (weak) IBOutlet NSMenuItem *hideWatchMenuItem;
 @end
 
 
@@ -34,8 +38,12 @@
     [self.statusItem setImage:image];
 
     self.recent = [[RecentData alloc] init];
-    self.recentAppsMenuItem.title = self.recent.appsDisabled ? @"Enable Recent App" : @"Disable Recent App";
-    self.recentSimulatorMenuItem.title = self.recent.simulatorDisabled ? @"Enable Recent Simulator" : @"Disable Recent Simulator";
+    [self updateRecentAppMenuItem];
+    [self updateRecentSimulatorMenuItem];
+    [self updateHideIPhoneMenuItems];
+    [self updateHideIPadMenuItems];
+    [self updateHideTVMenuItems];
+    [self updateHideWatchItems];
     
     self.menuBuilder = [[MenuBuilder alloc] init];
     self.menuBuilder.menu = self.statusMenu;
@@ -66,29 +74,67 @@
     }];
 }
 
-- (NSString *)simulatorDevicesDirectory {
-    NSString *libraryPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    return [libraryPath stringByAppendingPathComponent: @"Developer/CoreSimulator/Devices/"];
+- (void)updateRecentAppMenuItem {
+    self.recentAppsMenuItem.title = self.recent.appsDisabled ? @"Show Recent App" : @"Hide Recent App";
 }
 
-- (NSDate *)modificationTimeFor:(NSString *)file {
-    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[file stringByExpandingTildeInPath]
-                                                                                error:nil];
-    return [attributes fileModificationDate];
+- (void)updateRecentSimulatorMenuItem {
+    self.recentSimulatorMenuItem.title = self.recent.simulatorDisabled ? @"Show Recent Simulator" : @"Hide Recent Simulator";
 }
+
+- (void)updateHideIPhoneMenuItems {
+    self.hideIPhoneMenuItem.title = self.recent.iphoneDisabled ? @"Show iPhone Simulators" : @"Hide iPhone Simulators";
+}
+
+- (void)updateHideIPadMenuItems {
+    self.hideIPadMenuItem.title = self.recent.ipadDisabled ? @"Show iPad Simulators" : @"Hide iPad Simulators";
+}
+
+- (void)updateHideTVMenuItems {
+    self.hideTVMenuItem.title = self.recent.tvDisabled ? @"Show TV Simulators" : @"Hide TV Simulators";
+}
+
+- (void)updateHideWatchItems {
+    self.hideWatchMenuItem.title = self.recent.watchDisabled ? @"Show Watch Simulators" : @"Hide Watch Simulators";
+}
+
 
 
 // MARK: - Actions
 
-- (IBAction)actionRecentApps:(id)sender {
-    self.recent.appsDisabled = !self.recent.appsDisabled;
-    self.recentAppsMenuItem.title = self.recent.appsDisabled ? @"Enable Recent Apps" : @"Disable Recent Apps";
+- (IBAction)actionEnableIPhoneSimulators:(id)sender {
+    self.recent.iphoneDisabled = !self.recent.iphoneDisabled;
+    [self updateHideIPhoneMenuItems];
     [self.menuBuilder update];
 }
 
-- (IBAction)actionRecentSimulator:(id)sender {
+- (IBAction)actionEnableIPadSimulators:(id)sender {
+    self.recent.ipadDisabled = !self.recent.ipadDisabled;
+    [self updateHideIPadMenuItems];
+    [self.menuBuilder update];
+}
+
+- (IBAction)actionEnableTVSimulators:(id)sender {
+    self.recent.tvDisabled = !self.recent.tvDisabled;
+    [self updateHideTVMenuItems];
+    [self.menuBuilder update];
+}
+
+- (IBAction)actionEnableWatchSimulators:(id)sender {
+    self.recent.watchDisabled = !self.recent.watchDisabled;
+    [self updateHideWatchItems];
+    [self.menuBuilder update];
+}
+
+- (IBAction)actionEnableRecentApps:(id)sender {
+    self.recent.appsDisabled = !self.recent.appsDisabled;
+    [self updateRecentAppMenuItem];
+    [self.menuBuilder update];
+}
+
+- (IBAction)actionEnableRecentSimulators:(id)sender {
     self.recent.simulatorDisabled = !self.recent.simulatorDisabled;
-    self.recentSimulatorMenuItem.title = self.recent.simulatorDisabled ? @"Enable Recent Simulator" : @"Disable Recent Simulator";
+    [self updateRecentSimulatorMenuItem];
     [self.menuBuilder update];
 }
 

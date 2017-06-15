@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11B88CB11EF258D700BC497F /* SimulatorErase.sh in Resources */ = {isa = PBXBuildFile; fileRef = 11B88CB01EF258D700BC497F /* SimulatorErase.sh */; };
 		A90C056E1EEEFA8A00A39446 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C056D1EEEFA8A00A39446 /* AppDelegate.m */; };
 		A90C05711EEEFA8A00A39446 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05701EEEFA8A00A39446 /* main.m */; };
 		A90C05761EEEFA8A00A39446 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A90C05751EEEFA8A00A39446 /* Assets.xcassets */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11B88CB01EF258D700BC497F /* SimulatorErase.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SimulatorErase.sh; sourceTree = "<group>"; };
 		A90C05691EEEFA8A00A39446 /* XSimulatorMngr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XSimulatorMngr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A90C056C1EEEFA8A00A39446 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A90C056D1EEEFA8A00A39446 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				A90C05851EEEFB5C00A39446 /* SimulatorApp.m */,
 				A90C05861EEEFB5C00A39446 /* SimulatorDevice.h */,
 				A90C05871EEEFB5C00A39446 /* SimulatorDevice.m */,
+				11B88CB01EF258D700BC497F /* SimulatorErase.sh */,
 				A90C056F1EEEFA8A00A39446 /* Supporting Files */,
 			);
 			path = XSimulatorMngr;
@@ -149,6 +152,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11B88CB11EF258D700BC497F /* SimulatorErase.sh in Resources */,
 				A90C05761EEEFA8A00A39446 /* Assets.xcassets in Resources */,
 				A90C05791EEEFA8A00A39446 /* Main.storyboard in Resources */,
 			);
@@ -316,6 +320,7 @@
 				A90C057F1EEEFA8A00A39446 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

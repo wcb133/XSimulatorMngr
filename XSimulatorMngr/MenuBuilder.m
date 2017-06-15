@@ -18,22 +18,42 @@
         [self.menu removeItemAtIndex:0];
     }
     
-    if (self.recent.loading) {
-        [self buildLoadingMenu];
+    NSArray<NSMenuItem *> *array = self.menu.itemArray;
+    for (NSInteger index = 0; index < 11 && index < array.count; index++) {
+        NSMenuItem *item = array[index];
+        item.enabled = !self.emulatorsErasing;
+    }
+    
+    if (self.emulatorsErasing) {
+        [self buildErasingMenu];
     }
     else {
-        [self buildMenuForSimulators];
-        
-        if (!self.recent.simulatorDisabled) {
-            [self buildMenuForRecentSimulator];
+        if (self.recent.loading) {
+            [self buildLoadingMenu];
         }
-        
-        if (!self.recent.appsDisabled) {
-            [self buildMenuForRecentApps];
+        else {
+            [self buildMenuForSimulators];
+            
+            if (!self.recent.simulatorDisabled) {
+                [self buildMenuForRecentSimulator];
+            }
+            
+            if (!self.recent.appsDisabled) {
+                [self buildMenuForRecentApps];
+            }
+            
+            self.recent.updated = YES;
         }
-        
-        self.recent.updated = YES;
     }
+}
+
+- (void)buildErasingMenu {
+    NSInteger menuIndex = 0;
+    NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+    menuItem.enabled = NO;
+    menuItem.title = @"Erasing ...";
+    [self.menu insertItem:menuItem atIndex:menuIndex++];
+    [self.menu insertItem:[NSMenuItem separatorItem] atIndex:menuIndex++];
 }
 
 - (void)buildLoadingMenu {

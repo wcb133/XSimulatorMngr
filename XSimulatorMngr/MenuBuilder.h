@@ -13,6 +13,7 @@
 @interface MenuBuilder : NSObject
 @property (nonatomic, weak) NSMenu *menu;
 @property (nonatomic, strong) RecentData *recent;
+@property (nonatomic, assign) BOOL emulatorsErasing;
 
 - (void)update;
 @end

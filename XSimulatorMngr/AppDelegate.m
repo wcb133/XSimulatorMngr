@@ -45,6 +45,8 @@
     [self updateHideTVMenuItems];
     [self updateHideWatchItems];
     
+    self.statusMenu.autoenablesItems = NO;
+    
     self.menuBuilder = [[MenuBuilder alloc] init];
     self.menuBuilder.menu = self.statusMenu;
     self.menuBuilder.recent = self.recent;
@@ -143,6 +145,30 @@
 }
 
 - (IBAction)actionResetSimulators:(id)sender {
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.title = @"XSimulatorMngr";
+    notification.informativeText = @"Erase All Simulators...";
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    
+    self.menuBuilder.emulatorsErasing = YES;
+    [self.menuBuilder update];
+    [self.recent.simulators removeAllObjects];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSString *commandPath = [[NSBundle mainBundle] pathForResource:@"SimulatorErase" ofType:@"sh"];
+        
+        NSTask *task = [[NSTask alloc] init];
+        [task setLaunchPath:commandPath];
+        [task launch];
+        [task waitUntilExit];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            notification.informativeText = @"All Simulators are erased";
+            [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+            self.menuBuilder.emulatorsErasing = NO;
+            [self loadSimulators];
+        });
+    });
 }
 
 - (IBAction)actionQuit:(id)sender {

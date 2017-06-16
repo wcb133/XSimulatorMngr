@@ -6,5 +6,7 @@ XSimulatorMngr - XCode Simulators Manager, developer tool to manage iOS simulato
 - Support from XCode 6.0
 
 macOS statusbar application.
- 
+
+![Screenshot](https://github.com/xndrs/XSimulatorMngr/blob/master/screenshot/screenshot.png)
+
 Enjoy!

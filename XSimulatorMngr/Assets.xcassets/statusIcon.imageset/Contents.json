@@ -2,7 +2,6 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "statusIcon.png",
       "scale" : "1x"
     },
     {

@@ -108,6 +108,7 @@
     [self gatherAppInfoFromLastLaunchMap];
     [self gatherAppInfoFromAppState];
     [self gatherAppInfoFromInstallLogs];
+    [self gatherAppInfoFromSystemLog];
     [self cleanupAppList];
     return self.appList;
 }
@@ -168,6 +169,47 @@
                         [self extractSandboxLocationFromLogEntry: line];
                     }
                 }
+            }
+        }
+    }
+}
+
+- (void)gatherAppInfoFromSystemLog {
+    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/Logs/system.log"];
+    
+    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSString *installLog = [[NSString alloc] initWithContentsOfFile:path usedEncoding: nil error: nil];
+        
+        if (installLog != nil) {
+            for (NSString *line in [[installLog componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]] reverseObjectEnumerator]) {
+                if ([line rangeOfString: @"com.apple"].location == NSNotFound) {
+                    
+                    NSRange	logHintRange = [line rangeOfString: @"makeContainerLiveReplacingContainer"];
+                    if (logHintRange.location != NSNotFound) {
+                        [self extractInfoFromSystemLogEntry: line];
+                    }
+                }
+            }
+        }
+    }
+}
+
+- (void)extractInfoFromSystemLogEntry:(NSString *)inLine {
+    NSArray *logComponents = [inLine componentsSeparatedByString: @" "];
+    NSInteger bundleIdIndex = [logComponents count] - 3;
+
+    if (bundleIdIndex >= 0) {
+        NSString *bundleId = [logComponents objectAtIndex: bundleIdIndex];
+        SimulatorApp *appInfo = [self appInfoWithBundleId:bundleId];
+
+        if (appInfo) {
+            NSString *path = [logComponents lastObject];
+
+            if (!appInfo.sandboxPath && [path rangeOfString: @"/Containers/Data/Application/"].location != NSNotFound) {
+                appInfo.sandboxPath = path;
+            }
+            else if (!appInfo.bundlePath && [path rangeOfString: @"/Containers/Bundle/Application/"].location != NSNotFound) {
+                appInfo.bundlePath = path;
             }
         }
     }

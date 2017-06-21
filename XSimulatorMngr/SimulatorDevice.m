@@ -108,6 +108,7 @@
     [self gatherAppInfoFromLastLaunchMap];
     [self gatherAppInfoFromAppState];
     [self gatherAppInfoFromInstallLogs];
+    [self gatherAppInfoFromSystemLog];
     [self cleanupAppList];
     return self.appList;
 }
@@ -163,6 +164,31 @@
                         [self extractBundleLocationFromLogEntry: line];
                     }
 
+                    logHintRange = [line rangeOfString: @"_refreshUUIDForContainer"];
+                    if (logHintRange.location != NSNotFound) {
+                        [self extractSandboxLocationFromLogEntry: line];
+                    }
+                }
+            }
+        }
+    }
+}
+
+- (void)gatherAppInfoFromSystemLog {
+    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/Logs/system.log"];
+    
+    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSString *installLog = [[NSString alloc] initWithContentsOfFile:path usedEncoding: nil error: nil];
+        
+        if (installLog != nil) {
+            for (NSString *line in [[installLog componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]] reverseObjectEnumerator]) {
+                if ([line rangeOfString: @"com.apple"].location == NSNotFound) {
+
+                    NSRange	logHintRange = [line rangeOfString: @"makeContainerLiveReplacingContainer"];
+                    if (logHintRange.location != NSNotFound) {
+                        [self extractBundleLocationFromLogEntry: line];
+                    }
+                    
                     logHintRange = [line rangeOfString: @"_refreshUUIDForContainer"];
                     if (logHintRange.location != NSNotFound) {
                         [self extractSandboxLocationFromLogEntry: line];
@@ -233,7 +259,8 @@
 - (void)cleanupAppList {
     NSMutableArray *mysteryApps = [NSMutableArray array];
     for (SimulatorApp *app in self.appList) {
-        if (!app.hasValidPath) {
+        [app validatePaths];
+        if ([app.bundlePath length] == 0) {
             [mysteryApps addObject:app];
         }
     }

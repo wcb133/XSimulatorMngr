@@ -8,12 +8,16 @@
 #import "AppDelegate.h"
 #import "RecentData.h"
 #import "MenuBuilder.h"
+#import "DirectoryListener.h"
 
 
 @interface AppDelegate ()
 @property (nonatomic, strong) NSDate *lastModificationDate;
 @property (nonatomic, strong) RecentData *recent;
 @property (nonatomic, strong) MenuBuilder *menuBuilder;
+@property (nonatomic, strong) DirectoryListener *dirListener;
+@property (nonatomic, assign) BOOL needRefreshSimulators;
+
 @property (weak) IBOutlet NSMenuItem *recentAppsMenuItem;
 @property (weak) IBOutlet NSMenuItem *recentSimulatorMenuItem;
 @property (weak) IBOutlet NSMenuItem *refreshSimulatorsMenuItem;
@@ -51,18 +55,40 @@
     self.menuBuilder.menu = self.statusMenu;
     self.menuBuilder.recent = self.recent;
 
-    [self loadSimulators];
+
+    self.needRefreshSimulators = YES;
     [self.statusMenu setDelegate:self];
+    
+
+    self.dirListener = [[DirectoryListener alloc] init];
+    [self.dirListener.paths addObject:[self.recent simulatorDevicesDirectory]];
+    [self.dirListener start];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(directoryListenerChangedNotification:)
+                                                 name:kDirectoryListenerChangedNotification
+                                               object:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
+    [self.dirListener stop];
 }
 
 
 // MARK: - NSMenuDelegate
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
+    if (self.needRefreshSimulators && !self.recent.loading) {
+        [self loadSimulators];
+    }
     [self.menuBuilder update];
+}
+
+
+// MARK: - DirectoryListener Notifications
+
+- (void) directoryListenerChangedNotification:(NSNotification *) notification {
+    NSLog (@"directory changed");
+    self.needRefreshSimulators = YES;
 }
 
 
@@ -73,6 +99,7 @@
     [self.recent loadSimulatorsWithCompletion:^{
         self.refreshSimulatorsMenuItem.enabled = YES;
         [self.menuBuilder update];
+        self.needRefreshSimulators = NO;
     }];
 }
 

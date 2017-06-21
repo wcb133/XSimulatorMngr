@@ -25,4 +25,5 @@
 @property (nonatomic, weak)   SimulatorApp *app;
 
 - (void)loadSimulatorsWithCompletion:(void(^)(void))completionHandler;
+- (NSString *)simulatorDevicesDirectory;
 @end

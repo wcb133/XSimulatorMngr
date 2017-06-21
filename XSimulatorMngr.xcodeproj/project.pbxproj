@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		11B88CB11EF258D700BC497F /* SimulatorErase.sh in Resources */ = {isa = PBXBuildFile; fileRef = 11B88CB01EF258D700BC497F /* SimulatorErase.sh */; };
+		11F86C471EFA803C00F443C7 /* DirectoryListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 11F86C461EFA803C00F443C7 /* DirectoryListener.m */; };
 		A90C056E1EEEFA8A00A39446 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C056D1EEEFA8A00A39446 /* AppDelegate.m */; };
 		A90C05711EEEFA8A00A39446 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05701EEEFA8A00A39446 /* main.m */; };
 		A90C05761EEEFA8A00A39446 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A90C05751EEEFA8A00A39446 /* Assets.xcassets */; };
@@ -20,6 +21,8 @@
 
 /* Begin PBXFileReference section */
 		11B88CB01EF258D700BC497F /* SimulatorErase.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SimulatorErase.sh; sourceTree = "<group>"; };
+		11F86C451EFA803C00F443C7 /* DirectoryListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectoryListener.h; sourceTree = "<group>"; };
+		11F86C461EFA803C00F443C7 /* DirectoryListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DirectoryListener.m; sourceTree = "<group>"; };
 		A90C05691EEEFA8A00A39446 /* XSimulatorMngr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XSimulatorMngr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A90C056C1EEEFA8A00A39446 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A90C056D1EEEFA8A00A39446 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -70,6 +73,8 @@
 				A90C056C1EEEFA8A00A39446 /* AppDelegate.h */,
 				A90C056D1EEEFA8A00A39446 /* AppDelegate.m */,
 				A90C05751EEEFA8A00A39446 /* Assets.xcassets */,
+				11F86C451EFA803C00F443C7 /* DirectoryListener.h */,
+				11F86C461EFA803C00F443C7 /* DirectoryListener.m */,
 				A90C057A1EEEFA8A00A39446 /* Info.plist */,
 				A90C05771EEEFA8A00A39446 /* Main.storyboard */,
 				A90C05801EEEFB5C00A39446 /* MenuBuilder.h */,
@@ -166,6 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A90C05711EEEFA8A00A39446 /* main.m in Sources */,
+				11F86C471EFA803C00F443C7 /* DirectoryListener.m in Sources */,
 				A90C058A1EEEFB5C00A39446 /* SimulatorApp.m in Sources */,
 				A90C058B1EEEFB5C00A39446 /* SimulatorDevice.m in Sources */,
 				A90C05881EEEFB5C00A39446 /* MenuBuilder.m in Sources */,

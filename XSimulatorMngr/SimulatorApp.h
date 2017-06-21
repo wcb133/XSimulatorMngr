@@ -20,5 +20,5 @@
 - (void)updateFromLastLaunchMapInfo:(NSDictionary *)mapInfo;
 - (void)updateFromAppStateInfo:(NSDictionary *)stateInfo;
 - (void)refine;
-- (BOOL)hasValidPath;
+- (void)validatePaths;
 @end

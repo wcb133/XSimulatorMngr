@@ -28,7 +28,7 @@
         _ipadDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kIPadDisabled];
         _watchDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kWatchDisabled];
         _tvDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kTvdDisabled];
-        _loading = YES;
+        _loading = NO;
     }
     return self;
 }

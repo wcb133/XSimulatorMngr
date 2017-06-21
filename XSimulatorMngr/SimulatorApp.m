@@ -83,8 +83,14 @@
     }
 }
 
-- (BOOL)hasValidPath {
-    return [[NSFileManager defaultManager] fileExistsAtPath:self.bundlePath];
+- (void)validatePaths {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:self.bundlePath]) {
+        self.bundlePath = nil;
+    }
+    if (![fileManager fileExistsAtPath:self.sandboxPath]) {
+        self.sandboxPath = nil;
+    }
 }
 
 @end

@@ -183,33 +183,17 @@
         if (installLog != nil) {
             for (NSString *line in [[installLog componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]] reverseObjectEnumerator]) {
                 if ([line rangeOfString: @"com.apple"].location == NSNotFound) {
-                    
+
                     NSRange	logHintRange = [line rangeOfString: @"makeContainerLiveReplacingContainer"];
                     if (logHintRange.location != NSNotFound) {
-                        [self extractInfoFromSystemLogEntry: line];
+                        [self extractBundleLocationFromLogEntry: line];
+                    }
+                    
+                    logHintRange = [line rangeOfString: @"_refreshUUIDForContainer"];
+                    if (logHintRange.location != NSNotFound) {
+                        [self extractSandboxLocationFromLogEntry: line];
                     }
                 }
-            }
-        }
-    }
-}
-
-- (void)extractInfoFromSystemLogEntry:(NSString *)inLine {
-    NSArray *logComponents = [inLine componentsSeparatedByString: @" "];
-    NSInteger bundleIdIndex = [logComponents count] - 3;
-
-    if (bundleIdIndex >= 0) {
-        NSString *bundleId = [logComponents objectAtIndex: bundleIdIndex];
-        SimulatorApp *appInfo = [self appInfoWithBundleId:bundleId];
-
-        if (appInfo) {
-            NSString *path = [logComponents lastObject];
-
-            if (!appInfo.sandboxPath && [path rangeOfString: @"/Containers/Data/Application/"].location != NSNotFound) {
-                appInfo.sandboxPath = path;
-            }
-            else if (!appInfo.bundlePath && [path rangeOfString: @"/Containers/Bundle/Application/"].location != NSNotFound) {
-                appInfo.bundlePath = path;
             }
         }
     }
@@ -275,7 +259,8 @@
 - (void)cleanupAppList {
     NSMutableArray *mysteryApps = [NSMutableArray array];
     for (SimulatorApp *app in self.appList) {
-        if (!app.hasValidPath) {
+        [app validatePaths];
+        if ([app.bundlePath length] == 0) {
             [mysteryApps addObject:app];
         }
     }

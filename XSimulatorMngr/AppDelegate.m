@@ -87,7 +87,6 @@
 // MARK: - DirectoryListener Notifications
 
 - (void) directoryListenerChangedNotification:(NSNotification *) notification {
-    NSLog (@"directory changed");
     self.needRefreshSimulators = YES;
 }
 

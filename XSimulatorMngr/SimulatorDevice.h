@@ -2,26 +2,28 @@
 //  SimulatorDevice.h
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
 
 typedef enum : NSUInteger {
-    DeviceTypeNone,
-    DeviceTypeIPhone,
-    DeviceTypeIPad,
-    DeviceTypeTV,
-    DeviceTypeWatch
+    deviceTypeNone,
+    deviceTypeIPhone,
+    deviceTypeIPad,
+    deviceTypeTV,
+    deviceTypeWatch
 } DeviceType;
 
 
 @interface SimulatorDevice : NSObject
 @property (nonatomic, strong) NSString *udid;
+@property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *path;
-@property (nonatomic, assign) DeviceType type;
+@property (nonatomic, strong) NSString *runtimeVersion;
+@property (nonatomic, assign) DeviceType deviceType;
 
 - (instancetype)initWithPath:(NSString *)path;
 - (NSArray *)applications;

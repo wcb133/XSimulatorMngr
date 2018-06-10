@@ -2,17 +2,17 @@
 //  RecentData.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 #import "RecentData.h"
 
-#define kRecentAppsDisabled @"recentAppsDisabled"
+#define kRecentAppsDisabled      @"recentAppsDisabled"
 #define kRecentSimulatorDisabled @"recentSimulatorDisabled"
-#define kIPhoneDisabled @"iphoneDisabled"
-#define kIPadDisabled @"ipadDisabled"
-#define kWatchDisabled @"watchDisabled"
-#define kTvdDisabled @"tvdDisabled"
+#define kIPhoneDisabled          @"iphoneDisabled"
+#define kIPadDisabled            @"ipadDisabled"
+#define kWatchDisabled           @"watchDisabled"
+#define kTvdDisabled             @"tvdDisabled"
 
 
 @implementation RecentData
@@ -22,6 +22,7 @@
 -(instancetype)init {
     self = [super init];
     if (self) {
+        self.deviceGroups = [NSMutableArray array];
         _appsDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kRecentAppsDisabled];
         _simulatorDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kRecentSimulatorDisabled];
         _iphoneDisabled = [[NSUserDefaults standardUserDefaults] boolForKey:kIPhoneDisabled];
@@ -73,34 +74,69 @@
 }
 
 
-// MARK: - Other
+// MARK:- Other
 
 - (NSString *)simulatorDevicesDirectory {
     NSString *libraryPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    return [libraryPath stringByAppendingPathComponent:@"Developer/CoreSimulator/Devices/"];
+    return [libraryPath stringByAppendingPathComponent: @"Developer/CoreSimulator/Devices/"];
 }
 
-- (void)loadSimulatorsWithCompletion:(void(^)(void))completionHandler {
+- (void)loadSimulatorsWithCompletion: (void(^)(void))completionHandler {
     self.loading = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableArray *simulators = [NSMutableArray array];
-        NSString *directory = [self simulatorDevicesDirectory];
-        NSArray *content = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:nil];
+        NSArray *simulatorDevices = [self findSimulatorDevicesInDirectory:[self simulatorDevicesDirectory]];
+        NSMutableArray *groups = [self mapToGroups:simulatorDevices];
         
-        for (NSString *folderName in content) {
-            SimulatorDevice *simulator = [[SimulatorDevice alloc] initWithPath:[directory stringByAppendingPathComponent:folderName]];
-            if (simulator) {
-                [simulators addObject:simulator];
-            }
+        // sort groups
+        for (DeviceGroup *group in groups) {
+            [group.runTimeVersionGroups sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                RunTimeVersionGroup *group1 = (RunTimeVersionGroup *)obj1;
+                RunTimeVersionGroup *group2 = (RunTimeVersionGroup *)obj2;
+                return [group1.title compare:group2.title options:(NSCaseInsensitiveSearch | NSNumericSearch)];
+            }];
         }
+        [groups sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES]]];
         
-        [simulators sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES]]];
-        self.simulators = simulators;
+        // update UI
+        self.deviceGroups = groups;
         dispatch_sync(dispatch_get_main_queue(), ^{
             self.loading = NO;
             completionHandler();
         });
     });
+}
+
+/// \returns array of found simulator devices in directory
+- (NSArray *)findSimulatorDevicesInDirectory: (NSString *)directory {
+    NSMutableArray *devices = [NSMutableArray array];
+    NSArray *content = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:nil];
+    for (NSString *folderName in content) {
+        SimulatorDevice *simulatorDevice = [[SimulatorDevice alloc] initWithPath:[directory stringByAppendingPathComponent:folderName]];
+        if (simulatorDevice) {
+            [devices addObject:simulatorDevice];
+        }
+    }
+    return devices;
+}
+
+/// \returns map of devices. mappgin by deviceTitle->runTimeVersion
+- (NSMutableArray *)mapToGroups:(NSArray *)devices {
+    NSMutableArray *groups = [NSMutableArray array];
+    for (SimulatorDevice *device in devices) {
+        DeviceGroup *deviceGroup = nil;
+        for (DeviceGroup *group in groups) {
+            if ([group.title compare:device.name] == NSOrderedSame) {
+                deviceGroup = group;
+                break;
+            }
+        }
+        if (deviceGroup == nil) {
+            deviceGroup = [[DeviceGroup alloc] initWithTitle:device.name deviceType:device.deviceType];
+            [groups addObject:deviceGroup];
+        }
+        [deviceGroup mapToRunTimeVersions:device];
+    }
+    return groups;
 }
 
 @end

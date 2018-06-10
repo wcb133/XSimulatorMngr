@@ -2,7 +2,7 @@
 //  DirectoryListener.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 

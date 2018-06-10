@@ -2,15 +2,14 @@
 //  MenuBuilder.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 #import "MenuBuilder.h"
 
 @implementation MenuBuilder
 
-
-// MARK: - Main
+// MARK:- Main
 
 - (void)update {
     NSUInteger count = [[self.menu itemArray] count];
@@ -28,24 +27,27 @@
         [self buildErasingMenu];
     }
     else {
-        if (self.recent.loading) {
+        if (self.recentData.loading) {
             [self buildLoadingMenu];
         }
         else {
             [self buildMenuForSimulators];
             
-            if (!self.recent.simulatorDisabled) {
+            if (!self.recentData.simulatorDisabled) {
                 [self buildMenuForRecentSimulator];
             }
             
-            if (!self.recent.appsDisabled) {
+            if (!self.recentData.appsDisabled) {
                 [self buildMenuForRecentApps];
             }
             
-            self.recent.updated = YES;
+            self.recentData.updated = YES;
         }
     }
 }
+
+
+// MARK:- Build menu
 
 - (void)buildErasingMenu {
     NSInteger menuIndex = 0;
@@ -65,37 +67,57 @@
     [self.menu insertItem:[NSMenuItem separatorItem] atIndex:menuIndex++];
 }
 
+/// Build main menu, based on device groups
 - (void)buildMenuForSimulators {
     NSInteger index = 0;
-    for (SimulatorDevice *simulator in self.recent.simulators) {
-        if (self.recent.iphoneDisabled && simulator.type == DeviceTypeIPhone) {
+    for (DeviceGroup *group in self.recentData.deviceGroups) {
+        if (self.recentData.iphoneDisabled && group.deviceType == deviceTypeIPhone) {
             continue;
         }
-        if (self.recent.ipadDisabled && simulator.type == DeviceTypeIPad) {
+        if (self.recentData.ipadDisabled && group.deviceType == deviceTypeIPad) {
             continue;
         }
-        if (self.recent.tvDisabled && simulator.type == DeviceTypeTV) {
+        if (self.recentData.tvDisabled && group.deviceType == deviceTypeTV) {
             continue;
         }
-        if (self.recent.watchDisabled && simulator.type == DeviceTypeWatch) {
+        if (self.recentData.watchDisabled && group.deviceType == deviceTypeWatch) {
             continue;
         }
 
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-        menuItem.representedObject = simulator;
-        menuItem.title = simulator.title;
+        menuItem.representedObject = group;
+        menuItem.title = group.title? : @"<Unknown>";
         menuItem.target = self;
         menuItem.action = @selector(noAction:);
-        
+
         NSMenu *subMenu = [[NSMenu alloc] init];
         menuItem.submenu = subMenu;
-        [self buildMenu:subMenu forSimulator:simulator];
+        [self buildMenu:subMenu forGroup:group];
         [self.menu insertItem:menuItem atIndex:index];
         index++;
     }
     [self.menu insertItem:[NSMenuItem separatorItem] atIndex:index];
 }
 
+/// Build menu based on runTimeVersion, per each device group
+- (void)buildMenu:(NSMenu *)subMenu forGroup:(DeviceGroup *)group {
+    for (RunTimeVersionGroup *runTimeVersionGroup in group.runTimeVersionGroups) {
+        NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+        menuItem.representedObject = runTimeVersionGroup;
+        menuItem.title = runTimeVersionGroup.title? : @"<Unknown>";
+        menuItem.target = self;
+        menuItem.action = @selector(noAction:);
+        
+        for (SimulatorDevice *simulator in runTimeVersionGroup.devices) {
+            NSMenu *subMenu = [[NSMenu alloc] init];
+            menuItem.submenu = subMenu;
+            [self buildMenu:subMenu forSimulator:simulator];
+        }
+        [subMenu addItem:menuItem];
+    }
+}
+
+/// Build simulator menu
 - (void)buildMenu:(NSMenu *)subMenu forSimulator:(SimulatorDevice *)simulator {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
@@ -142,6 +164,7 @@
     }
 }
 
+/// Build menu to show recent apps
 - (void)buildMenuForRecentApps {
     NSInteger menuIndex = 0;
     NSMenuItem *menuItem = [[NSMenuItem alloc] init];
@@ -149,10 +172,10 @@
     menuItem.title = @"Recent App";
     [self.menu insertItem:menuItem atIndex:menuIndex++];
     
-    if (self.recent.app) {
+    if (self.recentData.app) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-        menuItem.representedObject = self.recent.app;
-        menuItem.title = self.recent.app.name? : @"<Unknown>";
+        menuItem.representedObject = self.recentData.app;
+        menuItem.title = self.recentData.app.name? : @"<Unknown>";
         menuItem.target = self;
         menuItem.action = @selector(actionOpenSimulatorApp:);
         [self.menu insertItem:menuItem atIndex:menuIndex++];
@@ -167,6 +190,7 @@
     [self.menu insertItem:[NSMenuItem separatorItem] atIndex:menuIndex++];
 }
 
+/// Build menu to show recent simulators
 - (void)buildMenuForRecentSimulator {
     NSInteger menuIndex = 0;
     NSMenuItem *menuItem = [[NSMenuItem alloc] init];
@@ -174,16 +198,16 @@
     menuItem.title = @"Recent Simulator";
     [self.menu insertItem:menuItem atIndex:menuIndex++];
     
-    if (self.recent.simulator) {
+    if (self.recentData.simulator) {
         NSMenuItem* menuItem = [[NSMenuItem alloc] init];
-        menuItem.representedObject = self.recent.simulator;
-        menuItem.title = self.recent.simulator.title;
+        menuItem.representedObject = self.recentData.simulator;
+        menuItem.title = self.recentData.simulator.title;
         menuItem.target = self;
         menuItem.action = @selector(noAction:);
         
         NSMenu *subMenu = [[NSMenu alloc] init];
         menuItem.submenu = subMenu;
-        [self buildMenu:subMenu forSimulator:self.recent.simulator];
+        [self buildMenu:subMenu forSimulator:self.recentData.simulator];
         [self.menu insertItem:menuItem atIndex:menuIndex++];
     }
     else {
@@ -197,38 +221,38 @@
 }
 
 
-// MARK: - Action
+// MARK:- Action
 
 -(void)noAction:(id)sender{
 }
 
 - (void)actionOpenSimulatorApp:(NSMenuItem *)menuItem {
-    self.recent.app = menuItem.representedObject;
-    self.recent.simulator = self.recent.app.simulator;
-    self.recent.updated = YES;
+    self.recentData.app = menuItem.representedObject;
+    self.recentData.simulator = self.recentData.app.simulator;
+    self.recentData.updated = YES;
     
-    NSString *appDataPath = self.recent.app.sandboxPath;
+    NSString *appDataPath = self.recentData.app.sandboxPath;
     if (appDataPath) {
         [[NSWorkspace sharedWorkspace] openURL: [NSURL fileURLWithPath: appDataPath]];
     } else {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"XSimulator Manager";
         [alert addButtonWithTitle: @"Close"];
-        alert.informativeText = [NSString stringWithFormat: @"Cannot find data folder for the app '%@'", self.recent.app.name];
+        alert.informativeText = [NSString stringWithFormat: @"Cannot find data folder for the app '%@'", self.recentData.app.name];
         [alert runModal];
     }
 }
 
 - (void)actionOpenSimulatorFolder:(NSMenuItem *)menuItem {
-    self.recent.simulator = menuItem.representedObject;
-    self.recent.updated = YES;
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:self.recent.simulator.path]];
+    self.recentData.simulator = menuItem.representedObject;
+    self.recentData.updated = YES;
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:self.recentData.simulator.path]];
 }
 
 - (void)actionOpenSimulatorDataFolder:(NSMenuItem *)menuItem {
-    self.recent.simulator = menuItem.representedObject;
-    self.recent.updated = YES;
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:[self.recent.simulator appDataPath]]];
+    self.recentData.simulator = menuItem.representedObject;
+    self.recentData.updated = YES;
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:[self.recentData.simulator appDataPath]]];
 }
 
 @end

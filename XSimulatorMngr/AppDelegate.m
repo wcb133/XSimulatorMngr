@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -13,7 +13,7 @@
 
 @interface AppDelegate ()
 @property (nonatomic, strong) NSDate *lastModificationDate;
-@property (nonatomic, strong) RecentData *recent;
+@property (nonatomic, strong) RecentData *recentData;
 @property (nonatomic, strong) MenuBuilder *menuBuilder;
 @property (nonatomic, strong) DirectoryListener *dirListener;
 @property (nonatomic, assign) BOOL needRefreshSimulators;
@@ -41,7 +41,7 @@
     image.template = YES;
     [self.statusItem setImage:image];
 
-    self.recent = [[RecentData alloc] init];
+    self.recentData = [[RecentData alloc] init];
     [self updateRecentAppMenuItem];
     [self updateRecentSimulatorMenuItem];
     [self updateHideIPhoneMenuItems];
@@ -53,15 +53,13 @@
     
     self.menuBuilder = [[MenuBuilder alloc] init];
     self.menuBuilder.menu = self.statusMenu;
-    self.menuBuilder.recent = self.recent;
-
+    self.menuBuilder.recentData = self.recentData;
 
     self.needRefreshSimulators = YES;
     [self.statusMenu setDelegate:self];
     
-
     self.dirListener = [[DirectoryListener alloc] init];
-    [self.dirListener.paths addObject:[self.recent simulatorDevicesDirectory]];
+    [self.dirListener.paths addObject:[self.recentData simulatorDevicesDirectory]];
     [self.dirListener start];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(directoryListenerChangedNotification:)
@@ -77,7 +75,7 @@
 // MARK: - NSMenuDelegate
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-    if (self.needRefreshSimulators && !self.recent.loading) {
+    if (self.needRefreshSimulators && !self.recentData.loading) {
         [self loadSimulators];
     }
     [self.menuBuilder update];
@@ -95,7 +93,7 @@
 
 - (void)loadSimulators {
     self.refreshSimulatorsMenuItem.enabled = NO;
-    [self.recent loadSimulatorsWithCompletion:^{
+    [self.recentData loadSimulatorsWithCompletion:^{
         self.refreshSimulatorsMenuItem.enabled = YES;
         [self.menuBuilder update];
         self.needRefreshSimulators = NO;
@@ -103,27 +101,27 @@
 }
 
 - (void)updateRecentAppMenuItem {
-    self.recentAppsMenuItem.title = self.recent.appsDisabled ? @"Show Recent App" : @"Hide Recent App";
+    self.recentAppsMenuItem.title = self.recentData.appsDisabled ? @"Show Recent App" : @"Hide Recent App";
 }
 
 - (void)updateRecentSimulatorMenuItem {
-    self.recentSimulatorMenuItem.title = self.recent.simulatorDisabled ? @"Show Recent Simulator" : @"Hide Recent Simulator";
+    self.recentSimulatorMenuItem.title = self.recentData.simulatorDisabled ? @"Show Recent Simulator" : @"Hide Recent Simulator";
 }
 
 - (void)updateHideIPhoneMenuItems {
-    self.hideIPhoneMenuItem.title = self.recent.iphoneDisabled ? @"Show iPhone Simulators" : @"Hide iPhone Simulators";
+    self.hideIPhoneMenuItem.title = self.recentData.iphoneDisabled ? @"Show iPhone Simulators" : @"Hide iPhone Simulators";
 }
 
 - (void)updateHideIPadMenuItems {
-    self.hideIPadMenuItem.title = self.recent.ipadDisabled ? @"Show iPad Simulators" : @"Hide iPad Simulators";
+    self.hideIPadMenuItem.title = self.recentData.ipadDisabled ? @"Show iPad Simulators" : @"Hide iPad Simulators";
 }
 
 - (void)updateHideTVMenuItems {
-    self.hideTVMenuItem.title = self.recent.tvDisabled ? @"Show TV Simulators" : @"Hide TV Simulators";
+    self.hideTVMenuItem.title = self.recentData.tvDisabled ? @"Show TV Simulators" : @"Hide TV Simulators";
 }
 
 - (void)updateHideWatchItems {
-    self.hideWatchMenuItem.title = self.recent.watchDisabled ? @"Show Watch Simulators" : @"Hide Watch Simulators";
+    self.hideWatchMenuItem.title = self.recentData.watchDisabled ? @"Show Watch Simulators" : @"Hide Watch Simulators";
 }
 
 
@@ -131,37 +129,37 @@
 // MARK: - Actions
 
 - (IBAction)actionEnableIPhoneSimulators:(id)sender {
-    self.recent.iphoneDisabled = !self.recent.iphoneDisabled;
+    self.recentData.iphoneDisabled = !self.recentData.iphoneDisabled;
     [self updateHideIPhoneMenuItems];
     [self.menuBuilder update];
 }
 
 - (IBAction)actionEnableIPadSimulators:(id)sender {
-    self.recent.ipadDisabled = !self.recent.ipadDisabled;
+    self.recentData.ipadDisabled = !self.recentData.ipadDisabled;
     [self updateHideIPadMenuItems];
     [self.menuBuilder update];
 }
 
 - (IBAction)actionEnableTVSimulators:(id)sender {
-    self.recent.tvDisabled = !self.recent.tvDisabled;
+    self.recentData.tvDisabled = !self.recentData.tvDisabled;
     [self updateHideTVMenuItems];
     [self.menuBuilder update];
 }
 
 - (IBAction)actionEnableWatchSimulators:(id)sender {
-    self.recent.watchDisabled = !self.recent.watchDisabled;
+    self.recentData.watchDisabled = !self.recentData.watchDisabled;
     [self updateHideWatchItems];
     [self.menuBuilder update];
 }
 
 - (IBAction)actionEnableRecentApps:(id)sender {
-    self.recent.appsDisabled = !self.recent.appsDisabled;
+    self.recentData.appsDisabled = !self.recentData.appsDisabled;
     [self updateRecentAppMenuItem];
     [self.menuBuilder update];
 }
 
 - (IBAction)actionEnableRecentSimulators:(id)sender {
-    self.recent.simulatorDisabled = !self.recent.simulatorDisabled;
+    self.recentData.simulatorDisabled = !self.recentData.simulatorDisabled;
     [self updateRecentSimulatorMenuItem];
     [self.menuBuilder update];
 }
@@ -178,7 +176,7 @@
     
     self.menuBuilder.emulatorsErasing = YES;
     [self.menuBuilder update];
-    [self.recent.simulators removeAllObjects];
+    [self.recentData.simulators removeAllObjects];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *commandPath = [[NSBundle mainBundle] pathForResource:@"SimulatorErase" ofType:@"sh"];

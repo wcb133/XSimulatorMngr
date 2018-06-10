@@ -2,7 +2,7 @@
 //  SimulatorDevice.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 assln. All rights reserved.
+//  Copyright © 2017 xndrs. All rights reserved.
 //
 
 #import "SimulatorDevice.h"
@@ -22,17 +22,13 @@
 
 @interface SimulatorDevice()
 @property (nonatomic, strong) NSMutableArray *appList;
-@property (nonatomic, strong) NSString *deviceType;
-@property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) NSString *runtime;
-@property (nonatomic, strong) NSString *runtimeVersion;
 @property (nonatomic, strong) NSNumber *state;
 @end
 
 
 @implementation SimulatorDevice
 
-// MARK: - Main
+// MARK:- Main
 
 - (instancetype)initWithPath:(NSString *)path {
     self = [super init];
@@ -50,15 +46,14 @@
         return NO;
     }
 
-    NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:infoPlist];
+    NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile: infoPlist];
     if (infoDict) {
         self.name = infoDict[@"name"];
-        self.runtime = infoDict[@"runtime"];
+        [self updateRuntimeVersionFromValue: infoDict[@"runtime"]];
         self.title = [self.name stringByAppendingFormat:@" (%@)", self.runtimeVersion];
         
         self.udid = infoDict[@"UDID"];
-        self.deviceType = infoDict[@"deviceType"];
-        [self updateType];
+        [self updateDeviceTypeFromValue: infoDict[@"deviceType"]];
 
         self.state = infoDict[@"state"];
         self.path = path;
@@ -67,34 +62,40 @@
     return NO;
 }
 
+/// \returns path for device's application data container
 - (NSString *)appDataPath {
-    NSString *dataFolder = [self.path stringByAppendingPathComponent: @"data/Containers/Data/Application"];
-    return dataFolder;
+    return  [self.path stringByAppendingPathComponent: @"data/Containers/Data/Application"];
 }
 
-- (NSString *)runtimeVersion {
-    NSString *version = [self.runtime stringByReplacingOccurrencesOfString:@"com.apple.CoreSimulator.SimRuntime." withString:@""];
-    version = [version stringByReplacingOccurrencesOfString:@"iOS-" withString:@"iOS "];
-    version = [version stringByReplacingOccurrencesOfString:@"-" withString:@"."];
-    return version;
+/// Set OS version
+///
+/// \param value runtime version string
+- (void) updateRuntimeVersionFromValue: (NSString *)value {
+    NSString *version = [value stringByReplacingOccurrencesOfString: @"com.apple.CoreSimulator.SimRuntime." withString: @""];
+    version = [version stringByReplacingOccurrencesOfString: @"iOS-" withString: @"iOS "];
+    version = [version stringByReplacingOccurrencesOfString: @"-" withString: @"."];
+    self.runtimeVersion = version;
 }
 
-- (void)updateType {
-    NSArray *components = [self.deviceType componentsSeparatedByString: @"."];
-    self.type = DeviceTypeNone;
+/// Set device type from plist dictionary "deviceType" key
+///
+/// \param value diveceType string
+- (void) updateDeviceTypeFromValue: (NSString *)value {
+    NSArray *components = [value componentsSeparatedByString: @"."];
+    self.deviceType = deviceTypeNone;
     if (components.count > 0) {
         NSString *lastComponent = [components[components.count - 1] lowercaseString];
         if ([lastComponent rangeOfString: @"iphone"].location != NSNotFound) {
-            self.type = DeviceTypeIPhone;
+            self.deviceType = deviceTypeIPhone;
         }
         else if ([lastComponent rangeOfString: @"ipad"].location != NSNotFound) {
-            self.type = DeviceTypeIPad;
+            self.deviceType = deviceTypeIPad;
         }
         else if ([lastComponent rangeOfString: @"tv"].location != NSNotFound) {
-            self.type = DeviceTypeTV;
+            self.deviceType = deviceTypeTV;
         }
         else if ([lastComponent rangeOfString: @"watch"].location != NSNotFound) {
-            self.type = DeviceTypeWatch;
+            self.deviceType = deviceTypeWatch;
         }
     }
 }
@@ -114,7 +115,7 @@
 }
 
 
-// MARK: - Scan
+// MARK:- Scan
 
 - (void)gatherAppInfoFromLastLaunchMap {
     NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/MobileInstallation/LastLaunchServicesMap.plist"];

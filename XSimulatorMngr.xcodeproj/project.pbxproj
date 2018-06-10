@@ -17,6 +17,8 @@
 		A90C05891EEEFB5C00A39446 /* RecentData.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05831EEEFB5C00A39446 /* RecentData.m */; };
 		A90C058A1EEEFB5C00A39446 /* SimulatorApp.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05851EEEFB5C00A39446 /* SimulatorApp.m */; };
 		A90C058B1EEEFB5C00A39446 /* SimulatorDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05871EEEFB5C00A39446 /* SimulatorDevice.m */; };
+		CB0E358B20CC0D9E00FCC120 /* DeviceGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = CB0E358A20CC0D9E00FCC120 /* DeviceGroup.m */; };
+		CB0E358F20CD5B5A00FCC120 /* RunTimeVersionGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = CB0E358E20CD5B5A00FCC120 /* RunTimeVersionGroup.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,10 @@
 		A90C05851EEEFB5C00A39446 /* SimulatorApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimulatorApp.m; sourceTree = "<group>"; };
 		A90C05861EEEFB5C00A39446 /* SimulatorDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimulatorDevice.h; sourceTree = "<group>"; };
 		A90C05871EEEFB5C00A39446 /* SimulatorDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimulatorDevice.m; sourceTree = "<group>"; };
+		CB0E358920CC0D9E00FCC120 /* DeviceGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceGroup.h; sourceTree = "<group>"; };
+		CB0E358A20CC0D9E00FCC120 /* DeviceGroup.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceGroup.m; sourceTree = "<group>"; };
+		CB0E358D20CD5B5A00FCC120 /* RunTimeVersionGroup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunTimeVersionGroup.h; sourceTree = "<group>"; };
+		CB0E358E20CD5B5A00FCC120 /* RunTimeVersionGroup.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunTimeVersionGroup.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +93,10 @@
 				A90C05871EEEFB5C00A39446 /* SimulatorDevice.m */,
 				11B88CB01EF258D700BC497F /* SimulatorErase.sh */,
 				A90C056F1EEEFA8A00A39446 /* Supporting Files */,
+				CB0E358920CC0D9E00FCC120 /* DeviceGroup.h */,
+				CB0E358A20CC0D9E00FCC120 /* DeviceGroup.m */,
+				CB0E358D20CD5B5A00FCC120 /* RunTimeVersionGroup.h */,
+				CB0E358E20CD5B5A00FCC120 /* RunTimeVersionGroup.m */,
 			);
 			path = XSimulatorMngr;
 			sourceTree = "<group>";
@@ -125,7 +135,7 @@
 		A90C05611EEEFA8A00A39446 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = assln;
 				TargetAttributes = {
 					A90C05681EEEFA8A00A39446 = {
@@ -171,11 +181,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A90C05711EEEFA8A00A39446 /* main.m in Sources */,
+				CB0E358F20CD5B5A00FCC120 /* RunTimeVersionGroup.m in Sources */,
 				11F86C471EFA803C00F443C7 /* DirectoryListener.m in Sources */,
 				A90C058A1EEEFB5C00A39446 /* SimulatorApp.m in Sources */,
 				A90C058B1EEEFB5C00A39446 /* SimulatorDevice.m in Sources */,
 				A90C05881EEEFB5C00A39446 /* MenuBuilder.m in Sources */,
 				A90C05891EEEFB5C00A39446 /* RecentData.m in Sources */,
+				CB0E358B20CC0D9E00FCC120 /* DeviceGroup.m in Sources */,
 				A90C056E1EEEFA8A00A39446 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -204,15 +216,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -252,15 +272,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -290,7 +318,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = XSimulatorMngr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = assln.XSimulatorMngr;
+				PRODUCT_BUNDLE_IDENTIFIER = xndrs.XSimulatorMngr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -302,7 +330,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = XSimulatorMngr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = assln.XSimulatorMngr;
+				PRODUCT_BUNDLE_IDENTIFIER = xndrs.XSimulatorMngr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

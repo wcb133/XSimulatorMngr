@@ -2,7 +2,7 @@
 //  DeviceGroup.m
 //  XSimulatorMngr
 //
-//  Copyright © 2018 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import "DeviceGroup.h"
@@ -20,7 +20,6 @@
     }
     return self;
 }
-
 
 // MARK: - Map device
 

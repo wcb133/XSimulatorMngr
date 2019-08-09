@@ -2,23 +2,15 @@
 //  SimulatorDevice.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import "SimulatorDevice.h"
 #import "SimulatorApp.h"
+#import "SQLiteReader.h"
 
-#define kSimulatorInfoFileName @"device.plist"
-
-//
-// Directories from https://github.com/somegeekintn/SimDirs
-// ../data/Library/MobileInstallation/LastLaunchServicesMap.plist
-// ../data/Library/BackBoard/applicationState.plist
-// ../data/Library/Logs/MobileInstallation/mobile_installation.log.0
-//
-// Gather parsers from https://github.com/tue-savvy/SimulatorManager
-//
-
+#define kSimulatorInfoFile @"device.plist"
+#define kTempPlistPath @"/tmp/xsimulatormngr_appinfo.plist"
 
 @interface SimulatorDevice()
 @property (nonatomic, strong) NSMutableArray *appList;
@@ -41,21 +33,22 @@
 }
 
 - (BOOL)loadFromPath:(NSString *)path {
-    NSString *infoPlist = [path stringByAppendingPathComponent:kSimulatorInfoFileName];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:infoPlist isDirectory:NULL]) {
+    NSString *infoPlist = [path stringByAppendingPathComponent:kSimulatorInfoFile];
+    BOOL isDir = NO;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:infoPlist isDirectory:&isDir] || isDir) {
         return NO;
     }
 
-    NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile: infoPlist];
-    if (infoDict) {
-        self.name = infoDict[@"name"];
-        [self updateRuntimeVersionFromValue: infoDict[@"runtime"]];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPlist];
+    if (dict) {
+        self.name = dict[@"name"];
+        [self updateRuntimeVersionFromValue: dict[@"runtime"]];
         self.title = [self.name stringByAppendingFormat:@" (%@)", self.runtimeVersion];
         
-        self.udid = infoDict[@"UDID"];
-        [self updateDeviceTypeFromValue: infoDict[@"deviceType"]];
+        self.udid = dict[@"UDID"];
+        [self updateDeviceTypeFromValue: dict[@"deviceType"]];
 
-        self.state = infoDict[@"state"];
+        self.state = dict[@"state"];
         self.path = path;
         return YES;
     }
@@ -106,172 +99,134 @@
     }
 
     self.appList = [NSMutableArray array];
-    [self gatherAppInfoFromLastLaunchMap];
-    [self gatherAppInfoFromAppState];
-    [self gatherAppInfoFromInstallLogs];
-    [self gatherAppInfoFromSystemLog];
-    [self cleanupAppList];
+    [self scanForBundleApplicationFolder];
+    [self scanForApplicationInfo];
+    [self scanForDataApplicationFolder];
     return self.appList;
 }
 
-
 // MARK:- Scan
 
-- (void)gatherAppInfoFromLastLaunchMap {
-    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/MobileInstallation/LastLaunchServicesMap.plist"];
+- (void)scanForBundleApplicationFolder {
+    NSString *appsFolder = [self.path stringByAppendingPathComponent:@"data/Containers/Bundle/Application"];
+    BOOL isDir = NO;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:appsFolder isDirectory:&isDir] && !isDir) {
+        return;
+    }
     
-    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSDictionary *launchInfo = [NSDictionary dictionaryWithContentsOfFile:path];
-        NSDictionary *userInfo = launchInfo[@"User"];
-        
-        for (NSString *bundleId in userInfo) {
-            SimulatorApp *appInfo = [self appInfoWithBundleId: bundleId];
-            if (appInfo != nil) {
-                [appInfo updateFromLastLaunchMapInfo: userInfo[bundleId]];
-            }
+    NSArray *content = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:appsFolder error:nil];
+    for (NSString *folderName in content) {
+        NSString *bundlePath = [appsFolder stringByAppendingPathComponent:folderName];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir] && isDir) {
+            [self.appList addObject:[[SimulatorApp alloc] initWithBundlePath:bundlePath]];
         }
     }
 }
 
-- (void)gatherAppInfoFromAppState {
-    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/BackBoard/applicationState.plist"];
-
-    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSDictionary *stateInfo = [NSDictionary dictionaryWithContentsOfFile:path];
-
-        for (NSString *bundleId in stateInfo) {
-            if ([bundleId rangeOfString: @"com.apple"].location == NSNotFound) {
-                SimulatorApp *appInfo = [self appInfoWithBundleId: bundleId];
-                if (appInfo != nil) {
-                    [appInfo updateFromAppStateInfo: stateInfo[bundleId]];
-                }
-            }
-        }
-    }
-}
-
-- (void)gatherAppInfoFromInstallLogs {
-    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/Logs/MobileInstallation/mobile_installation.log.0"];
-    
-    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSString *installLog = [[NSString alloc] initWithContentsOfFile:path usedEncoding: nil error: nil];
-
-        if (installLog != nil) {
-            for (NSString *line in [[installLog componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]] reverseObjectEnumerator]) {
-                if ([line rangeOfString: @"com.apple"].location == NSNotFound) {
-
-                    NSRange	logHintRange = [line rangeOfString: @"makeContainerLiveReplacingContainer"];
-                    if (logHintRange.location != NSNotFound) {
-                        [self extractBundleLocationFromLogEntry: line];
-                    }
-
-                    logHintRange = [line rangeOfString: @"_refreshUUIDForContainer"];
-                    if (logHintRange.location != NSNotFound) {
-                        [self extractSandboxLocationFromLogEntry: line];
-                    }
-                }
-            }
-        }
-    }
-}
-
-- (void)gatherAppInfoFromSystemLog {
-    NSString *path = [self.path stringByAppendingPathComponent: @"data/Library/Logs/system.log"];
-    
-    if (path != nil && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSString *installLog = [[NSString alloc] initWithContentsOfFile:path usedEncoding: nil error: nil];
-        
-        if (installLog != nil) {
-            for (NSString *line in [[installLog componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]] reverseObjectEnumerator]) {
-                if ([line rangeOfString: @"com.apple"].location == NSNotFound) {
-
-                    NSRange	logHintRange = [line rangeOfString: @"makeContainerLiveReplacingContainer"];
-                    if (logHintRange.location != NSNotFound) {
-                        [self extractBundleLocationFromLogEntry: line];
-                    }
-                    
-                    logHintRange = [line rangeOfString: @"_refreshUUIDForContainer"];
-                    if (logHintRange.location != NSNotFound) {
-                        [self extractSandboxLocationFromLogEntry: line];
-                    }
-                }
-            }
-        }
-    }
-}
-
-- (void)extractBundleLocationFromLogEntry:(NSString *)inLine {
-    NSArray	 *logComponents = [inLine componentsSeparatedByString: @" "];
-    NSString *bundlePath = [logComponents lastObject];
-    
-    if (bundlePath != nil) {
-        NSInteger bundleIdIndex = [logComponents count] - 3;
-
-        if (bundleIdIndex >= 0) {
-            NSString	 *bundleId = [logComponents objectAtIndex: bundleIdIndex];
-            SimulatorApp *appInfo = [self appInfoWithBundleId:bundleId];
-
-            if (appInfo != nil && !appInfo.bundlePath) {
-                appInfo.bundlePath = bundlePath;
-            }
-        }
-    }
-}
-
-- (void)extractSandboxLocationFromLogEntry:(NSString *)inLine {
-    NSArray	 *logComponents = [inLine componentsSeparatedByString: @" "];
-    NSString *sandboxPath = [logComponents lastObject];
-    
-    if (sandboxPath != nil) {
-        NSInteger bundleIdIndex = [logComponents count] - 5;
-
-        if (bundleIdIndex >= 0) {
-            NSString	 *bundleId = [logComponents objectAtIndex:bundleIdIndex];
-            SimulatorApp *appInfo = [self appInfoWithBundleId:bundleId];
-
-            if (appInfo != nil && !appInfo.sandboxPath) {
-                appInfo.sandboxPath = sandboxPath;
-            }
-        }
-    }
-}
-
-- (SimulatorApp *)appInfoWithBundleId:(NSString *)bundleId {
-    SimulatorApp *appInfo = nil;
-    NSInteger appIndex;
-
-    appIndex = [self.appList indexOfObjectPassingTest: ^(id inObject, NSUInteger inIndex, BOOL *outStop) {
-        SimulatorApp *appInfo = inObject;
-        *outStop = [appInfo.bundleId isEqualToString:bundleId];
-        return *outStop;
-    }];
-
-    if (appIndex == NSNotFound) {
-        appInfo = [[SimulatorApp alloc] initWithBundleId:bundleId simulator:self];
-        [self.appList addObject: appInfo];
-    }
-    else {
-        appInfo = [self.appList objectAtIndex: appIndex];
-    }
-
-    return appInfo;
-}
-
-- (void)cleanupAppList {
-    NSMutableArray *mysteryApps = [NSMutableArray array];
+- (void)scanForApplicationInfo {
     for (SimulatorApp *app in self.appList) {
-        [app validatePaths];
-        if ([app.bundlePath length] == 0) {
-            [mysteryApps addObject:app];
+        NSArray *folderContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:app.bundlePath error:nil];
+        for (NSString *folderItem in folderContent) {
+            
+            NSRange range = [folderItem rangeOfString: @".app" options:NSBackwardsSearch];
+            if (!(range.location != NSNotFound && folderItem.length - 4 == range.location && range.location > 0)) {
+                continue;
+            }
+            
+            // set initial name
+            app.name = [folderItem substringWithRange:NSMakeRange(0, range.location)];
+            
+            // get application info from plist
+            NSString *plistPath = [[app.bundlePath stringByAppendingPathComponent:folderItem] stringByAppendingPathComponent:@"Info.plist"];
+            if ([[NSFileManager defaultManager] fileExistsAtPath: plistPath]) {
+                NSData *plistData = [NSData dataWithContentsOfFile:plistPath];
+                if (plistData != nil) {
+                    NSDictionary *plist = [NSPropertyListSerialization propertyListWithData:plistData
+                                                                                        options:NSPropertyListImmutable
+                                                                                         format:nil error: nil];
+                    if (plist != nil) {
+                        [self scanForApplicationInfoFromPList:plist app:app];
+                    }
+                }
+            }
         }
     }
+}
 
-    [self.appList removeObjectsInArray: mysteryApps];
-    [self.appList sortUsingDescriptors: @[[NSSortDescriptor sortDescriptorWithKey: @"name" ascending:YES ]]];
-
-    for (SimulatorApp *app in self.appList) {
-        [app refine];
+- (void)scanForApplicationInfoFromPList:(NSDictionary *)plist app:(SimulatorApp *)app {
+    // set app name from plist
+    NSString *name = plist[@"CFBundleDisplayName"];
+    if ([name length] == 0) {
+        name = plist[@"CFBundleName"];
     }
+    if ([name length] > 0) {
+        app.name = name;
+    }
+    
+    // set app bundle identifier
+    app.bundleId = plist[@"CFBundleIdentifier"];
+}
+
+- (void)scanForDataApplicationFolder {
+    if ([self.appList count] == 0) {
+        return;
+    }
+    
+    NSString *databasePath = [self.path stringByAppendingPathComponent:@"/data/Library/FrontBoard/applicationState.db"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath: databasePath]) {
+        return;
+    }
+    
+    SQLiteReader *reader = [[SQLiteReader alloc] init];
+    if ([reader open:databasePath]) {
+        
+        for (SimulatorApp *app in self.appList) {
+            NSInteger identifier = [reader getIdForApplicationIdentifier:app.bundleId];
+            if (identifier <= 0) {
+                continue;
+            }
+            
+            NSInteger keyIdentifier = [reader getIdForKey:@"compatibilityInfo"];
+            if (keyIdentifier <= 0) {
+                continue;
+            }
+            
+            NSData *data = [reader getValueFor:identifier withKey:keyIdentifier];
+            if (data == NULL) {
+                continue;
+            }
+            
+            NSError *error;
+            NSPropertyListFormat format;
+            id plist = [NSPropertyListSerialization propertyListWithData: data
+                                                                 options: NSPropertyListImmutable
+                                                                  format: &format
+                                                                   error: &error];
+            if (plist == nil || format != NSPropertyListBinaryFormat_v1_0) {
+                NSLog (@"[ERROR]: could not deserialize binary data");
+                continue;
+            }
+            
+            [plist writeToFile:kTempPlistPath atomically:NO];
+            NSDictionary *dict= [NSDictionary dictionaryWithContentsOfFile:kTempPlistPath];
+            if (dict == NULL) {
+                continue;
+            }
+            
+            id objects = dict[@"$objects"];
+            if (objects && [objects isKindOfClass:[NSArray class]]) {
+                for (id object in objects) {
+                    if ([object isKindOfClass:[NSString class]]) {
+                        if ([((NSString *)object) rangeOfString:@"/data/Containers/Data/Application/"].location != NSNotFound) {
+                            app.sandboxPath = (NSString *)object;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    [reader close];
 }
 
 @end

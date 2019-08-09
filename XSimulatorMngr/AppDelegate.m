@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -71,16 +71,14 @@
     [self.dirListener stop];
 }
 
-
 // MARK: - NSMenuDelegate
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
     if (self.needRefreshSimulators && !self.recentData.loading) {
-        [self loadSimulators];
+        [self updateSimulatorsInfo];
     }
     [self.menuBuilder update];
 }
-
 
 // MARK: - DirectoryListener Notifications
 
@@ -88,12 +86,11 @@
     self.needRefreshSimulators = YES;
 }
 
-
 // MARK: - Other
 
-- (void)loadSimulators {
+- (void)updateSimulatorsInfo {
     self.refreshSimulatorsMenuItem.enabled = NO;
-    [self.recentData loadSimulatorsWithCompletion:^{
+    [self.recentData loadSimulatorsInfoWithCompletion:^{
         self.refreshSimulatorsMenuItem.enabled = YES;
         [self.menuBuilder update];
         self.needRefreshSimulators = NO;
@@ -123,8 +120,6 @@
 - (void)updateHideWatchItems {
     self.hideWatchMenuItem.title = self.recentData.watchDisabled ? @"Show Watch Simulators" : @"Hide Watch Simulators";
 }
-
-
 
 // MARK: - Actions
 
@@ -165,7 +160,7 @@
 }
 
 - (IBAction)actionRefreshSimulators:(id)sender {
-    [self loadSimulators];
+    [self updateSimulatorsInfo];
 }
 
 - (IBAction)actionResetSimulators:(id)sender {
@@ -187,10 +182,10 @@
         [task waitUntilExit];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            notification.informativeText = @"All Simulators are erased";
+            notification.informativeText = @"All Simulators erased";
             [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
             self.menuBuilder.emulatorsErasing = NO;
-            [self loadSimulators];
+            [self updateSimulatorsInfo];
         });
     });
 }

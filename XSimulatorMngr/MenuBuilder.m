@@ -2,7 +2,7 @@
 //  MenuBuilder.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import "MenuBuilder.h"
@@ -31,7 +31,7 @@
             [self buildLoadingMenu];
         }
         else {
-            [self buildMenuForSimulators];
+            [self buildSimulatorsMenu];
             
             if (!self.recentData.simulatorDisabled) {
                 [self buildMenuForRecentSimulator];
@@ -45,7 +45,6 @@
         }
     }
 }
-
 
 // MARK:- Build menu
 
@@ -68,7 +67,7 @@
 }
 
 /// Build main menu, based on device groups
-- (void)buildMenuForSimulators {
+- (void)buildSimulatorsMenu {
     NSInteger index = 0;
     for (DeviceGroup *group in self.recentData.deviceGroups) {
         if (self.recentData.iphoneDisabled && group.deviceType == deviceTypeIPhone) {
@@ -84,23 +83,23 @@
             continue;
         }
 
-        NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-        menuItem.representedObject = group;
-        menuItem.title = group.title? : @"<Unknown>";
-        menuItem.target = self;
-        menuItem.action = @selector(noAction:);
+        NSMenuItem *groupMenu = [[NSMenuItem alloc] init];
+        groupMenu.representedObject = group;
+        groupMenu.title = group.title? : @"<Unknown>";
+        groupMenu.target = self;
+        groupMenu.action = @selector(noAction:);
 
-        NSMenu *subMenu = [[NSMenu alloc] init];
-        menuItem.submenu = subMenu;
-        [self buildMenu:subMenu forGroup:group];
-        [self.menu insertItem:menuItem atIndex:index];
+        NSMenu *runTimeVersionMenu = [[NSMenu alloc] init];
+        groupMenu.submenu = runTimeVersionMenu;
+        [self buildRunTimeVersionMenu:runTimeVersionMenu forGroup:group];
+        [self.menu insertItem:groupMenu atIndex:index];
         index++;
     }
     [self.menu insertItem:[NSMenuItem separatorItem] atIndex:index];
 }
 
 /// Build menu based on runTimeVersion, per each device group
-- (void)buildMenu:(NSMenu *)subMenu forGroup:(DeviceGroup *)group {
+- (void)buildRunTimeVersionMenu:(NSMenu *)runTimeVersionMenu forGroup:(DeviceGroup *)group {
     for (RunTimeVersionGroup *runTimeVersionGroup in group.runTimeVersionGroups) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
         menuItem.representedObject = runTimeVersionGroup;
@@ -109,16 +108,16 @@
         menuItem.action = @selector(noAction:);
         
         for (SimulatorDevice *simulator in runTimeVersionGroup.devices) {
-            NSMenu *subMenu = [[NSMenu alloc] init];
-            menuItem.submenu = subMenu;
-            [self buildMenu:subMenu forSimulator:simulator];
+            NSMenu *deviceMenu = [[NSMenu alloc] init];
+            menuItem.submenu = deviceMenu;
+            [self buildMenu:deviceMenu forDevice:simulator];
         }
-        [subMenu addItem:menuItem];
+        [runTimeVersionMenu addItem:menuItem];
     }
 }
 
 /// Build simulator menu
-- (void)buildMenu:(NSMenu *)subMenu forSimulator:(SimulatorDevice *)simulator {
+- (void)buildMenu:(NSMenu *)menu forDevice:(SimulatorDevice *)simulator {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     NSMenuItem *menuItem = [[NSMenuItem alloc] init];
@@ -130,20 +129,20 @@
     if (![fileManager fileExistsAtPath:rootPath]) {
         menuItem.image  = [NSImage imageNamed: @"warning"];
     }
-    [subMenu addItem:menuItem];
+    [menu addItem:menuItem];
     
     NSString *dataPath = [simulator appDataPath];
     if ([fileManager fileExistsAtPath:dataPath]) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-        menuItem.title = @"App Data Folder";
+        menuItem.title = @"SandBoxes";
         menuItem.representedObject = simulator;
         menuItem.target = self;
         menuItem.action = @selector(actionOpenSimulatorDataFolder:);
-        [subMenu addItem:menuItem];
+        [menu addItem:menuItem];
     }
-    [subMenu addItem:[NSMenuItem separatorItem]];
+    [menu addItem:[NSMenuItem separatorItem]];
     
-    for (SimulatorApp *app in simulator.applications) {
+    for (SimulatorApp *app in [simulator applications]) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
         menuItem.representedObject = app;
         menuItem.title = app.name? : @"<Unknown>";
@@ -151,16 +150,16 @@
         menuItem.action = @selector(actionOpenSimulatorApp:);
         NSString *dataPath = [app sandboxPath];
         if (![fileManager fileExistsAtPath:dataPath]) {
-            menuItem.image  = [NSImage imageNamed: @"warning"];
+            menuItem.image = [NSImage imageNamed: @"warning"];
         }
-        [subMenu addItem:menuItem];
+        [menu addItem:menuItem];
     }
     
     if (simulator.applications.count == 0) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] init];
         menuItem.enabled = NO;
         menuItem.title = @"No App";
-        [subMenu addItem:menuItem];
+        [menu addItem:menuItem];
     }
 }
 
@@ -207,7 +206,7 @@
         
         NSMenu *subMenu = [[NSMenu alloc] init];
         menuItem.submenu = subMenu;
-        [self buildMenu:subMenu forSimulator:self.recentData.simulator];
+        [self buildMenu:subMenu forDevice:self.recentData.simulator];
         [self.menu insertItem:menuItem atIndex:menuIndex++];
     }
     else {
@@ -219,7 +218,6 @@
     
     [self.menu insertItem:[NSMenuItem separatorItem] atIndex:menuIndex++];
 }
-
 
 // MARK:- Action
 

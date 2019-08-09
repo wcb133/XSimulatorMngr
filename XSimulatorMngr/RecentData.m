@@ -2,7 +2,7 @@
 //  RecentData.m
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import "RecentData.h"
@@ -33,7 +33,6 @@
     }
     return self;
 }
-
 
 // MARK: - Setters
 
@@ -73,7 +72,6 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-
 // MARK:- Other
 
 - (NSString *)simulatorDevicesDirectory {
@@ -81,15 +79,15 @@
     return [libraryPath stringByAppendingPathComponent: @"Developer/CoreSimulator/Devices/"];
 }
 
-- (void)loadSimulatorsWithCompletion: (void(^)(void))completionHandler {
+- (void)loadSimulatorsInfoWithCompletion: (void(^)(void))completionHandler {
     self.loading = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *simulatorDevices = [self findSimulatorDevicesInDirectory:[self simulatorDevicesDirectory]];
-        NSMutableArray *groups = [self mapToGroups:simulatorDevices];
+        NSArray *devices = [self getDevicesInDirectory:[self simulatorDevicesDirectory]];
+        NSMutableArray *groups = [self mapToGroups:devices];
         
         // sort groups
         for (DeviceGroup *group in groups) {
-            [group.runTimeVersionGroups sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            [group.runTimeVersionGroups sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
                 RunTimeVersionGroup *group1 = (RunTimeVersionGroup *)obj1;
                 RunTimeVersionGroup *group2 = (RunTimeVersionGroup *)obj2;
                 return [group1.title compare:group2.title options:(NSCaseInsensitiveSearch | NSNumericSearch)];
@@ -107,7 +105,7 @@
 }
 
 /// \returns array of found simulator devices in directory
-- (NSArray *)findSimulatorDevicesInDirectory: (NSString *)directory {
+- (NSMutableArray *)getDevicesInDirectory:(NSString *)directory {
     NSMutableArray *devices = [NSMutableArray array];
     NSArray *content = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:nil];
     for (NSString *folderName in content) {

@@ -2,7 +2,7 @@
 //  AppDelegate.h
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,14 +11,11 @@
 
 @interface SimulatorApp : NSObject
 @property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSImage *appIcon;
 @property (nonatomic, strong) NSString *bundleId;
 @property (nonatomic, strong) NSString *bundlePath;
 @property (nonatomic, strong) NSString *sandboxPath;
 @property (nonatomic, weak)   SimulatorDevice *simulator;
 
-- (instancetype)initWithBundleId:(NSString *)bundleId simulator:(SimulatorDevice *)simulator;
-- (void)updateFromLastLaunchMapInfo:(NSDictionary *)mapInfo;
-- (void)updateFromAppStateInfo:(NSDictionary *)stateInfo;
-- (void)refine;
-- (void)validatePaths;
+- (instancetype)initWithBundlePath:(NSString *)bundlePath;
 @end

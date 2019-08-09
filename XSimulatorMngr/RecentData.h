@@ -2,7 +2,7 @@
 //  RecentData.h
 //  XSimulatorMngr
 //
-//  Copyright © 2017 xndrs. All rights reserved.
+//  Copyright © 2019 xndrs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -26,6 +26,6 @@
 @property (nonatomic, weak)   SimulatorDevice *simulator;
 @property (nonatomic, weak)   SimulatorApp *app;
 
-- (void) loadSimulatorsWithCompletion: (void(^)(void))completionHandler;
-- (NSString *) simulatorDevicesDirectory;
+- (void)loadSimulatorsInfoWithCompletion:(void(^)(void))completionHandler;
+- (NSString *)simulatorDevicesDirectory;
 @end

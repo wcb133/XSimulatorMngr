@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		11B88CB11EF258D700BC497F /* SimulatorErase.sh in Resources */ = {isa = PBXBuildFile; fileRef = 11B88CB01EF258D700BC497F /* SimulatorErase.sh */; };
 		11F86C471EFA803C00F443C7 /* DirectoryListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 11F86C461EFA803C00F443C7 /* DirectoryListener.m */; };
+		5EB91E6D22FB319A00241297 /* SQLiteReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB91E6C22FB319A00241297 /* SQLiteReader.m */; };
+		5EB91E7022FB31DA00241297 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB91E6F22FB31DA00241297 /* libsqlite3.tbd */; };
 		A90C056E1EEEFA8A00A39446 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C056D1EEEFA8A00A39446 /* AppDelegate.m */; };
 		A90C05711EEEFA8A00A39446 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A90C05701EEEFA8A00A39446 /* main.m */; };
 		A90C05761EEEFA8A00A39446 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A90C05751EEEFA8A00A39446 /* Assets.xcassets */; };
@@ -25,6 +27,9 @@
 		11B88CB01EF258D700BC497F /* SimulatorErase.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SimulatorErase.sh; sourceTree = "<group>"; };
 		11F86C451EFA803C00F443C7 /* DirectoryListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectoryListener.h; sourceTree = "<group>"; };
 		11F86C461EFA803C00F443C7 /* DirectoryListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DirectoryListener.m; sourceTree = "<group>"; };
+		5EB91E6B22FB319A00241297 /* SQLiteReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteReader.h; sourceTree = "<group>"; };
+		5EB91E6C22FB319A00241297 /* SQLiteReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SQLiteReader.m; sourceTree = "<group>"; };
+		5EB91E6F22FB31DA00241297 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		A90C05691EEEFA8A00A39446 /* XSimulatorMngr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XSimulatorMngr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A90C056C1EEEFA8A00A39446 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A90C056D1EEEFA8A00A39446 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -51,17 +56,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EB91E7022FB31DA00241297 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5EB91E6E22FB31DA00241297 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5EB91E6F22FB31DA00241297 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A90C05601EEEFA8A00A39446 = {
 			isa = PBXGroup;
 			children = (
 				A90C056B1EEEFA8A00A39446 /* XSimulatorMngr */,
 				A90C056A1EEEFA8A00A39446 /* Products */,
+				5EB91E6E22FB31DA00241297 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,6 +94,8 @@
 				A90C056C1EEEFA8A00A39446 /* AppDelegate.h */,
 				A90C056D1EEEFA8A00A39446 /* AppDelegate.m */,
 				A90C05751EEEFA8A00A39446 /* Assets.xcassets */,
+				CB0E358920CC0D9E00FCC120 /* DeviceGroup.h */,
+				CB0E358A20CC0D9E00FCC120 /* DeviceGroup.m */,
 				11F86C451EFA803C00F443C7 /* DirectoryListener.h */,
 				11F86C461EFA803C00F443C7 /* DirectoryListener.m */,
 				A90C057A1EEEFA8A00A39446 /* Info.plist */,
@@ -87,16 +104,16 @@
 				A90C05811EEEFB5C00A39446 /* MenuBuilder.m */,
 				A90C05821EEEFB5C00A39446 /* RecentData.h */,
 				A90C05831EEEFB5C00A39446 /* RecentData.m */,
+				CB0E358D20CD5B5A00FCC120 /* RunTimeVersionGroup.h */,
+				CB0E358E20CD5B5A00FCC120 /* RunTimeVersionGroup.m */,
 				A90C05841EEEFB5C00A39446 /* SimulatorApp.h */,
 				A90C05851EEEFB5C00A39446 /* SimulatorApp.m */,
 				A90C05861EEEFB5C00A39446 /* SimulatorDevice.h */,
 				A90C05871EEEFB5C00A39446 /* SimulatorDevice.m */,
 				11B88CB01EF258D700BC497F /* SimulatorErase.sh */,
+				5EB91E6B22FB319A00241297 /* SQLiteReader.h */,
+				5EB91E6C22FB319A00241297 /* SQLiteReader.m */,
 				A90C056F1EEEFA8A00A39446 /* Supporting Files */,
-				CB0E358920CC0D9E00FCC120 /* DeviceGroup.h */,
-				CB0E358A20CC0D9E00FCC120 /* DeviceGroup.m */,
-				CB0E358D20CD5B5A00FCC120 /* RunTimeVersionGroup.h */,
-				CB0E358E20CD5B5A00FCC120 /* RunTimeVersionGroup.m */,
 			);
 			path = XSimulatorMngr;
 			sourceTree = "<group>";
@@ -135,7 +152,7 @@
 		A90C05611EEEFA8A00A39446 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = assln;
 				TargetAttributes = {
 					A90C05681EEEFA8A00A39446 = {
@@ -149,6 +166,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -182,6 +200,7 @@
 			files = (
 				A90C05711EEEFA8A00A39446 /* main.m in Sources */,
 				CB0E358F20CD5B5A00FCC120 /* RunTimeVersionGroup.m in Sources */,
+				5EB91E6D22FB319A00241297 /* SQLiteReader.m in Sources */,
 				11F86C471EFA803C00F443C7 /* DirectoryListener.m in Sources */,
 				A90C058A1EEEFB5C00A39446 /* SimulatorApp.m in Sources */,
 				A90C058B1EEEFB5C00A39446 /* SimulatorDevice.m in Sources */,
@@ -210,6 +229,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -266,6 +286,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -318,7 +339,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = XSimulatorMngr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = xndrs.XSimulatorMngr;
+				PRODUCT_BUNDLE_IDENTIFIER = xndrs.xsimulatormngr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -330,7 +351,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = XSimulatorMngr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = xndrs.XSimulatorMngr;
+				PRODUCT_BUNDLE_IDENTIFIER = xndrs.xsimulatormngr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
